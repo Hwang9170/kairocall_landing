@@ -13,6 +13,8 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+  const [isMobile, setIsMobile] = useState(false);
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -29,6 +31,38 @@ export default function Home() {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 640px)');
+    const updateMatch = () => setIsMobile(mediaQuery.matches);
+    updateMatch();
+
+    mediaQuery.addEventListener('change', updateMatch);
+    return () => mediaQuery.removeEventListener('change', updateMatch);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setShowStickyCTA(false);
+      return;
+    }
+
+    const ctaSection = document.getElementById('cta');
+    if (!ctaSection) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyCTA(!entry.isIntersecting);
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -120px 0px',
+      },
+    );
+
+    observer.observe(ctaSection);
+    return () => observer.disconnect();
+  }, [isMobile]);
 
   const handleSubmit = async (e: React.FormEvent, source: string) => {
     e.preventDefault();
@@ -56,23 +90,28 @@ export default function Home() {
   const isVisible = (id: string) => visibleElements.has(id);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-24 sm:pb-0 overflow-x-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="text-2xl font-bold text-gray-900">
               Kairo<span className="text-blue-600">Call</span>
             </div>
           </div>
-          <a href="#cta" className="btn-primary text-sm">
-            사전 등록
-          </a>
+          <div className="flex items-center gap-3">
+            <a href="#cta" className="text-sm font-semibold text-blue-600 sm:hidden">
+              사전 등록
+            </a>
+            <a href="#cta" className="btn-primary text-xs px-4 py-2 hidden sm:inline-flex sm:text-sm sm:px-6 sm:py-3">
+              사전 등록
+            </a>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-blue-50/30 to-white">
+      <section className="pt-28 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-blue-50/30 to-white">
         <div className="max-w-4xl mx-auto text-center">
           <div
             id="hero-badge"
@@ -88,7 +127,7 @@ export default function Home() {
           <h1
             id="hero-title"
             data-animate
-            className={`text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6 transition-all duration-700 delay-100 ${
+            className={`text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6 transition-all duration-700 delay-100 ${
               isVisible('hero-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
@@ -150,7 +189,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div
@@ -218,7 +257,7 @@ export default function Home() {
       </section>
 
       {/* Value Proposition */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2
             id="value-title"
@@ -244,7 +283,7 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <div
@@ -316,7 +355,7 @@ export default function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div
@@ -391,7 +430,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
             <div
@@ -465,7 +504,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700">
+      <section id="cta" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2
             id="cta-title"
@@ -525,7 +564,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-gray-400 py-10 sm:py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
@@ -566,6 +605,19 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {showStickyCTA && (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-blue-100 bg-white/95 px-4 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.12)] backdrop-blur-md sm:hidden">
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-semibold text-gray-800">
+              하루 5분 통화로 부모님과 더 가까이
+            </div>
+            <a href="#cta" className="btn-primary w-full justify-center text-base py-3">
+              사전 등록
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
