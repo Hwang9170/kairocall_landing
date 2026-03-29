@@ -266,7 +266,7 @@ export default function Home() {
               isVisible('value-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            부모님은 <span className="text-yellow-300">말벗</span>이 생기고<br />
+            부모님은 <span className="text-yellow-300">말벗</span>을 얻고<br />
             자녀는 <span className="text-yellow-300">안심</span>을 얻습니다
           </h2>
           <p
