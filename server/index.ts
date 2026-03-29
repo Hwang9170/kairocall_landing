@@ -1,5 +1,6 @@
 import express from "express";
 import { createServer } from "http";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,7 +10,17 @@ const __dirname = path.dirname(__filename);
 const isProd = process.env.NODE_ENV === "production";
 const isRunningOnVercel = Boolean(process.env.VERCEL);
 
-const staticPath = isProd || isRunningOnVercel ? path.resolve(__dirname, "public") : path.resolve(__dirname, "..", "dist", "public");
+const candidateStaticPaths = [
+  path.resolve(__dirname, "public"),
+  path.resolve(__dirname, "..", "dist", "public"),
+  path.resolve(process.cwd(), "dist", "public"),
+];
+
+const staticPath = candidateStaticPaths.find((candidate) => fs.existsSync(path.join(candidate, "index.html"))) ?? candidateStaticPaths[0];
+
+if (!fs.existsSync(path.join(staticPath, "index.html"))) {
+  console.warn(`[server] Could not find index.html in ${staticPath}. Make sure you have run \"pnpm run build\" before starting the server.`);
+}
 
 const app = express();
 
