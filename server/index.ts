@@ -34,7 +34,3 @@ if (!isRunningOnVercel) {
 }
 
 export default app;
-
-export const config = {
-  runtime: "nodejs20.x",
-};
